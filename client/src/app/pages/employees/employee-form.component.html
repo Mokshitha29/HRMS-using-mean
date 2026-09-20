@@ -1,0 +1,225 @@
+<div class="employee-form-page">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1 text-dark">{{ isEditMode ? 'Edit Employee Record' : 'Add New Employee' }}</h3>
+      <p class="text-muted mb-0">{{ isEditMode ? 'Update existing personnel details.' : 'Fill in the information to register a new staff member.' }}</p>
+    </div>
+    <a routerLink="/employees" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+      <i class="bi bi-arrow-left"></i>
+      <span>Back to List</span>
+    </a>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div>{{ errorMessage }}</div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading employee...</span>
+        </div>
+      </div>
+
+      <form *ngIf="!loading" [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+          <!-- Employee ID -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Employee ID <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. EMP-101"
+              formControlName="employeeId"
+              [ngClass]="{ 'is-invalid': f['employeeId'].touched && f['employeeId'].errors }"
+            />
+            <div *ngIf="f['employeeId'].touched && f['employeeId'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['employeeId'].errors['required']">Employee ID is required.</span>
+              <span *ngIf="f['employeeId'].errors['pattern']">Only letters, numbers, hyphens and underscores allowed.</span>
+            </div>
+          </div>
+
+          <!-- First Name -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. John"
+              formControlName="firstName"
+              [ngClass]="{ 'is-invalid': f['firstName'].touched && f['firstName'].errors }"
+            />
+            <div *ngIf="f['firstName'].touched && f['firstName'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['firstName'].errors['required']">First name is required.</span>
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. Doe"
+              formControlName="lastName"
+              [ngClass]="{ 'is-invalid': f['lastName'].touched && f['lastName'].errors }"
+            />
+            <div *ngIf="f['lastName'].touched && f['lastName'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['lastName'].errors['required']">Last name is required.</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+            <input
+              type="email"
+              class="form-control"
+              placeholder="john.doe@company.com"
+              formControlName="email"
+              [ngClass]="{ 'is-invalid': f['email'].touched && f['email'].errors }"
+            />
+            <div *ngIf="f['email'].touched && f['email'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['email'].errors['required']">Email is required.</span>
+              <span *ngIf="f['email'].errors['email']">Please provide a valid email address.</span>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. +1 555-0199"
+              formControlName="phone"
+              [ngClass]="{ 'is-invalid': f['phone'].touched && f['phone'].errors }"
+            />
+            <div *ngIf="f['phone'].touched && f['phone'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['phone'].errors['required']">Phone number is required.</span>
+              <span *ngIf="f['phone'].errors['pattern']">Please enter a valid phone number.</span>
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Date of Birth <span class="text-danger">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="dateOfBirth"
+              [ngClass]="{ 'is-invalid': f['dateOfBirth'].touched && f['dateOfBirth'].errors }"
+            />
+            <div *ngIf="f['dateOfBirth'].touched && f['dateOfBirth'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['dateOfBirth'].errors['required']">Date of birth is required.</span>
+            </div>
+          </div>
+
+          <!-- Joining Date -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Joining Date <span class="text-danger">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="joiningDate"
+              [ngClass]="{ 'is-invalid': f['joiningDate'].touched && f['joiningDate'].errors }"
+            />
+            <div *ngIf="f['joiningDate'].touched && f['joiningDate'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['joiningDate'].errors['required']">Joining date is required.</span>
+            </div>
+          </div>
+
+          <!-- Department -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Department <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="department">
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+
+          <!-- Designation -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Designation <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. Full Stack Developer"
+              formControlName="designation"
+              [ngClass]="{ 'is-invalid': f['designation'].touched && f['designation'].errors }"
+            />
+            <div *ngIf="f['designation'].touched && f['designation'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['designation'].errors['required']">Designation is required.</span>
+            </div>
+          </div>
+
+          <!-- Base Salary -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Base Annual Salary ($) <span class="text-danger">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="e.g. 75000"
+              formControlName="salary"
+              [ngClass]="{ 'is-invalid': f['salary'].touched && f['salary'].errors }"
+            />
+            <div *ngIf="f['salary'].touched && f['salary'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['salary'].errors['required']">Salary is required.</span>
+              <span *ngIf="f['salary'].errors['min']">Salary cannot be negative.</span>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Residential Address -->
+          <div class="col-12 col-md-8">
+            <label class="form-label fw-semibold">Address <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g. 123 Main St, Suite 400, City, State"
+              formControlName="address"
+              [ngClass]="{ 'is-invalid': f['address'].touched && f['address'].errors }"
+            />
+            <div *ngIf="f['address'].touched && f['address'].errors" class="text-danger small mt-1">
+              <span *ngIf="f['address'].errors['required']">Address is required.</span>
+            </div>
+          </div>
+
+          <!-- Form Buttons -->
+          <div class="col-12 pt-3 border-top mt-4 d-flex justify-content-end gap-2">
+            <a routerLink="/employees" class="btn btn-light px-4">Cancel</a>
+            <button
+              type="submit"
+              class="btn btn-primary px-4 fw-semibold"
+              [disabled]="employeeForm.invalid || submitting"
+            >
+              <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+              {{ submitting ? 'Saving...' : (isEditMode ? 'Update Employee' : 'Save Employee') }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

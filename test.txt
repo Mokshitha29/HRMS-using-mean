@@ -1,0 +1,2 @@
+# HRMS Scratch Project Directory
+This directory contains the complete MEAN stack HRMS application.

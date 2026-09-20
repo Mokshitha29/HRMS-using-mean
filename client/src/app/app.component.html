@@ -1,0 +1,21 @@
+<!-- If user is logged in and not on login/register pages, show full App Shell with Sidebar & Navbar -->
+<div *ngIf="showAppShell()" class="app-wrapper">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="app-content">
+    <app-navbar></app-navbar>
+
+    <main class="main-view">
+      <router-outlet></router-outlet>
+    </main>
+
+    <app-footer></app-footer>
+  </div>
+</div>
+
+<!-- If on public auth page (login/register), show clean full width view -->
+<div *ngIf="!showAppShell()" class="auth-wrapper min-vh-100 d-flex flex-column justify-content-center bg-light">
+  <router-outlet></router-outlet>
+</div>

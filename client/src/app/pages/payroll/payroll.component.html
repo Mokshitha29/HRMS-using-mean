@@ -1,0 +1,251 @@
+<div class="payroll-page">
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h3 class="fw-bold mb-1 text-dark">Payroll Management</h3>
+      <p class="text-muted mb-0">Compute employee salaries, manage disbursements, and track payment histories.</p>
+    </div>
+    <div *ngIf="isAdminOrHr()">
+      <button (click)="openCreateModal()" class="btn btn-primary d-flex align-items-center gap-2">
+        <i class="bi bi-cash-stack"></i>
+        <span>Generate Payroll</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <div class="row g-2 align-items-center">
+        <!-- Month Filter -->
+        <div class="col-6 col-md-3">
+          <label class="small text-muted mb-1 d-block">Month</label>
+          <select class="form-select" [(ngModel)]="filterMonth" (change)="onFilterChange()">
+            <option value="All">All Months</option>
+            <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+
+        <!-- Year Filter -->
+        <div class="col-6 col-md-2">
+          <label class="small text-muted mb-1 d-block">Year</label>
+          <select class="form-select" [(ngModel)]="filterYear" (change)="onFilterChange()">
+            <option value="All">All Years</option>
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <!-- Payment Status Filter -->
+        <div class="col-6 col-md-3">
+          <label class="small text-muted mb-1 d-block">Payment Status</label>
+          <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+
+        <!-- Employee Filter (Admin/HR only) -->
+        <div *ngIf="isAdminOrHr()" class="col-6 col-md-3">
+          <label class="small text-muted mb-1 d-block">Employee</label>
+          <select class="form-select" [(ngModel)]="filterEmployee" (change)="onFilterChange()">
+            <option value="All">All Employees</option>
+            <option *ngFor="let emp of employees" [value]="emp._id">
+              {{ emp.firstName }} {{ emp.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="col-12" [ngClass]="isAdminOrHr() ? 'col-md-1 text-end d-flex align-items-end' : 'col-md-4 text-end d-flex align-items-end'">
+          <button
+            (click)="filterMonth = 'All'; filterYear = 'All'; filterStatus = 'All'; filterEmployee = 'All'; loadPayroll()"
+            class="btn btn-outline-secondary w-100 mt-md-4"
+            title="Reset Filters"
+          >
+            <i class="bi bi-arrow-counterclockwise"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading payroll...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && payrollRecords.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-wallet2 display-4 text-secondary mb-3 d-block"></i>
+        <h5>No payroll records found</h5>
+        <p class="small">Click 'Generate Payroll' to create salary records.</p>
+      </div>
+
+      <div *ngIf="!loading && payrollRecords.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Period</th>
+              <th>Basic Salary</th>
+              <th>Allowances</th>
+              <th>Deductions</th>
+              <th>Net Salary</th>
+              <th>Status</th>
+              <th>Payment Date</th>
+              <th *ngIf="isAdminOrHr()" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of payrollRecords">
+              <td>
+                <div class="fw-semibold text-dark">{{ getEmployeeDisplayName(record.employeeId) }}</div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ record.month }} {{ record.year }}</span>
+              </td>
+              <td class="small">{{ record.basicSalary | currency:'USD':'symbol':'1.0-0' }}</td>
+              <td class="small text-success">+{{ record.allowances | currency:'USD':'symbol':'1.0-0' }}</td>
+              <td class="small text-danger">-{{ record.deductions | currency:'USD':'symbol':'1.0-0' }}</td>
+              <td class="fw-bold text-dark fs-6">{{ record.netSalary | currency:'USD':'symbol':'1.0-0' }}</td>
+              <td>
+                <span class="badge" [ngClass]="record.paymentStatus === 'Paid' ? 'bg-success' : 'bg-warning text-dark'">
+                  {{ record.paymentStatus }}
+                </span>
+              </td>
+              <td class="small text-muted">{{ record.paymentDate ? (record.paymentDate | date:'mediumDate') : '-' }}</td>
+              <td *ngIf="isAdminOrHr()" class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <!-- Mark Paid Quick Action -->
+                  <button
+                    *ngIf="record.paymentStatus === 'Pending'"
+                    (click)="markAsPaid(record)"
+                    class="btn btn-outline-success"
+                    title="Mark as Paid"
+                  >
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  <button (click)="openEditModal(record)" class="btn btn-outline-primary" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button (click)="deleteCandidate = record" class="btn btn-outline-danger" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate / Edit Payroll Modal -->
+  <div *ngIf="showModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-cash-coin me-2"></i>
+            {{ isEditMode ? 'Update Payroll Record' : 'Generate Monthly Payroll' }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+
+        <form [formGroup]="payrollForm" (ngSubmit)="submitPayroll()">
+          <div class="modal-body p-4">
+            <!-- Employee -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Employee <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="employeeId" (change)="onEmployeeSelect($any($event.target).value)">
+                <option *ngFor="let emp of employees" [value]="emp._id">
+                  {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Month & Year -->
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Month <span class="text-danger">*</span></label>
+                <select class="form-select" formControlName="month">
+                  <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Year <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" formControlName="year" />
+              </div>
+            </div>
+
+            <!-- Basic Salary -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Basic Salary ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" formControlName="basicSalary" />
+            </div>
+
+            <!-- Allowances & Deductions -->
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Allowances ($)</label>
+                <input type="number" class="form-control" formControlName="allowances" />
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Deductions ($)</label>
+                <input type="number" class="form-control" formControlName="deductions" />
+              </div>
+            </div>
+
+            <!-- Net Salary Calculation Display -->
+            <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-between align-items-center">
+              <span class="small fw-semibold">Calculated Net Salary:</span>
+              <span class="fs-5 fw-bold text-primary">{{ calculatedNetSalary | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="mb-2">
+              <label class="form-label fw-semibold">Payment Status <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="paymentStatus">
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="submitting">Cancel</button>
+            <button type="submit" class="btn btn-primary fw-semibold" [disabled]="payrollForm.invalid || submitting">
+              <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+              {{ submitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Generate Payroll') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div *ngIf="deleteCandidate" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Payroll Record</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="deleteCandidate = null"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p>Are you sure you want to delete the payroll record for <strong>{{ deleteCandidate.month }} {{ deleteCandidate.year }}</strong>?</p>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" (click)="deleteCandidate = null" [disabled]="deleting">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+            {{ deleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
