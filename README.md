@@ -2,6 +2,11 @@
 
 A complete, beginner-friendly, and functional Human Resource Management System (HRMS) built from scratch using the **MEAN Stack** (MongoDB, Express.js, Angular, and Node.js) with Bootstrap 5.
 
+## 🚀 Deployment
+
+- **Frontend:** [HRMS Live Application](https://hrms-frontend-seven-mu.vercel.app)
+- **Backend:** [HRMS REST API](https://hrms-backend-jab9.onrender.com)
+- **Database:** MongoDB Atlas
 ---
 
 ## 1. Project Overview
