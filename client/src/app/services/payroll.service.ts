@@ -8,7 +8,7 @@ import { Payroll } from '../models/payroll.model';
   providedIn: 'root',
 })
 export class PayrollService {
-  private readonly apiUrl = 'http://localhost:5000/api/payroll';
+  readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/payroll';
 
   constructor(private http: HttpClient) {}
 

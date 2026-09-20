@@ -9,7 +9,7 @@ import { AuthResponse, LoginPayload, RegisterPayload, User, UserRole } from '../
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:5000/api/auth';
+ readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/auth';
   private readonly TOKEN_KEY = 'hrms_token';
   private readonly USER_KEY = 'hrms_user';
 

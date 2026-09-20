@@ -8,7 +8,7 @@ import { Attendance } from '../models/attendance.model';
   providedIn: 'root',
 })
 export class AttendanceService {
-  private readonly apiUrl = 'http://localhost:5000/api/attendance';
+  readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/attendance';
 
   constructor(private http: HttpClient) {}
 

@@ -17,7 +17,7 @@ export interface DashboardStats {
   providedIn: 'root',
 })
 export class DashboardService {
-  private readonly apiUrl = 'http://localhost:5000/api/dashboard/stats';
+  readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/dashboard/stats';
 
   constructor(private http: HttpClient) {}
 

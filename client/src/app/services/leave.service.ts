@@ -8,7 +8,7 @@ import { Leave } from '../models/leave.model';
   providedIn: 'root',
 })
 export class LeaveService {
-  private readonly apiUrl = 'http://localhost:5000/api/leaves';
+  readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/leaves';
 
   constructor(private http: HttpClient) {}
 

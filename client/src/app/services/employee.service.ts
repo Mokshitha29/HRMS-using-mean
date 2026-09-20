@@ -8,7 +8,7 @@ import { Employee } from '../models/employee.model';
   providedIn: 'root',
 })
 export class EmployeeService {
-  private readonly apiUrl = 'http://localhost:5000/api/employees';
+  readonly apiUrl = 'https://hrms-backend-jab9.onrender.com/api/employees';
 
   constructor(private http: HttpClient) {}
 
