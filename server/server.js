@@ -14,7 +14,11 @@ const app = express();
 // Enable CORS
 app.use(
   cors({
-    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+    origin: [
+      'http://localhost:4200',
+      'http://127.0.0.1:4200',
+      'https://hrms-frontend-seven-mu.vercel.app'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -85,11 +89,19 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Server Port
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
-  console.log(`[Server] HRMS API Server listening on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`[Server] API Base URL: http://localhost:${PORT}/api`);
+  console.log(
+    `[Server] HRMS API Server listening on port ${PORT} in ${
+      process.env.NODE_ENV || 'development'
+    } mode`
+  );
+
+  console.log(
+    `[Server] API Base URL: http://localhost:${PORT}/api`
+  );
 });
 
 // Handle unhandled promise rejections
